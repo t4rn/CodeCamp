@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MyCodeCamp.Data;
 
 namespace CodeCamp
 {
@@ -24,17 +25,27 @@ namespace CodeCamp
 
         private IConfigurationRoot _config;
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        // Executed once, as the server starts
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton(_config);
+            services.AddDbContext<CampContext>(ServiceLifetime.Scoped);
+            services.AddScoped<ICampRepository, CampRepository>();
+            services.AddTransient<CampDbInitializer>(); // seed the db, if necessary
 
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(x =>
+                {
+                    x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        // Executed once, as the server starts
+        public void Configure(IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory loggerFactory,
+            CampDbInitializer dbSeeder)
         {
             loggerFactory.AddConsole(_config.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -43,6 +54,8 @@ namespace CodeCamp
             {
                 //x.MapRoute("MainAPIRoute", "api/{controller}/{action}");
             });
+
+            dbSeeder.Seed().Wait();
         }
     }
 }
