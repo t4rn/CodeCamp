@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CodeCamp.Api.Filters;
 using CodeCamp.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 namespace CodeCamp.Api.Controllers
 {
     [Route("api/[controller]")]
+    [ValidateModel]
     public class CampsController : BaseController
     {
         private readonly ILogger _logger;
@@ -69,11 +71,6 @@ namespace CodeCamp.Api.Controllers
         {
             try
             {
-                if (ModelState.IsValid == false)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 _logger.LogInformation($"Creating na new Code Camp '{model.Name}'");
 
                 Camp camp = _mapper.Map<Camp>(model);
@@ -102,11 +99,6 @@ namespace CodeCamp.Api.Controllers
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(ModelState);
-                }
-
                 Camp oldCamp = _repo.GetCampByMoniker(moniker);
                 if (oldCamp == null)
                 {

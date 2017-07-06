@@ -25,6 +25,15 @@ namespace CodeCamp.Api.Models
                     Country = c.LocationCountry
                 }))
                 ;
+
+            CreateMap<Speaker, SpeakerModel>()
+                .ForMember(c => c.Url, options => options.ResolveUsing<SpeakerUrlResolver>())
+                .ReverseMap()
+                ;
+
+            CreateMap<Talk, TalkModel>()
+                .ForMember(t => t.Url, options => options.ResolveUsing<TalkUrlResolver>())
+                .ReverseMap();
         }
     }
 }
