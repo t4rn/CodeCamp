@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CodeCamp", "src\CodeCamp\CodeCamp.xproj", "{889C40C6-516D-4D15-AE63-0740D95E348F}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CodeCamp.Api", "src\CodeCamp.Api\CodeCamp.Api.xproj", "{889C40C6-516D-4D15-AE63-0740D95E348F}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "MyCodeCamp.Data", "src\MyCodeCamp.Data\MyCodeCamp.Data.xproj", "{27499CF7-2060-4F57-9166-9A2468674626}"
 EndProject
