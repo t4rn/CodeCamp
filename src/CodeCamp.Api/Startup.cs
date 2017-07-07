@@ -8,8 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CodeCamp.Api
@@ -71,6 +73,7 @@ namespace CodeCamp.Api
                 };
             });
 
+            // CORS
             services.AddCors(cfg =>
             {
                 cfg.AddPolicy("Wildermuth", b =>
@@ -86,6 +89,12 @@ namespace CodeCamp.Api
                     .WithMethods("GET")
                     .AllowAnyOrigin();
                 });
+            });
+
+            // Policies for Claims
+            services.AddAuthorization(cfg =>
+            {
+                cfg.AddPolicy("SuperUsers", p => p.RequireClaim("SuperUser", "True"));
             });
 
             // Add framework services.
@@ -118,11 +127,26 @@ namespace CodeCamp.Api
             {
                 cfg.AllowAnyHeader()
                 .AllowAnyMethod()
-                .WithOrigins("http://wildermuth.com");
+                .WithOrigins("http://github.com/t4rn");
             });
             */
 
             app.UseIdentity();
+
+            // JWT
+            app.UseJwtBearerAuthentication(new JwtBearerOptions()
+            {
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true,
+                TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidIssuer = _config["Tokens:Issuer"],
+                    ValidAudience = _config["Tokens:Audience"],
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Tokens:Key"])),
+                    ValidateLifetime = true
+                }
+            });
 
             app.UseMvc(x =>
             {

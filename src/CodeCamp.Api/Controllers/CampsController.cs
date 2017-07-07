@@ -64,13 +64,14 @@ namespace CodeCamp.Api.Controllers
             }
             catch (Exception ex)
             {
-
+                _logger.LogError($"Ex in Get by moniker: {moniker}: {ex}");
             }
 
             return BadRequest();
         }
 
         [EnableCors("Wildermuth")]
+        [Authorize(Policy = "SuperUsers")]
         [HttpPost]
         public async Task<IActionResult> Post([FromBody]CampModel model)
         {
