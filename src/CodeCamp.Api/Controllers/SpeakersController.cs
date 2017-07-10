@@ -9,18 +9,21 @@ using MyCodeCamp.Data;
 using MyCodeCamp.Data.Entities;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CodeCamp.Api.Controllers
 {
     [Route("api/camps/{moniker}/speakers")]
     [ValidateModel]
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
     public class SpeakersController : BaseController
     {
-        private readonly ILogger<SpeakersController> _logger;
-        private readonly IMapper _mapper;
-        private readonly ICampRepository _repo;
-        private readonly UserManager<CampUser> _userMgr;
+        protected readonly ILogger<SpeakersController> _logger;
+        protected readonly IMapper _mapper;
+        protected readonly ICampRepository _repo;
+        protected readonly UserManager<CampUser> _userMgr;
 
         public SpeakersController(ICampRepository repo,
             ILogger<SpeakersController> logger,
@@ -37,11 +40,24 @@ namespace CodeCamp.Api.Controllers
         /// Example: http://localhost:8088/api/camps/ATL2016/speakers?includeTalks=true
         /// </summary>
         [HttpGet]
+        [MapToApiVersion("1.0")]
         public IActionResult Get(string moniker, bool includeTalks = false)
         {
             IEnumerable<Speaker> speakers = includeTalks ? _repo.GetSpeakersByMonikerWithTalks(moniker) : _repo.GetSpeakersByMoniker(moniker);
             return Ok(_mapper.Map<IEnumerable<SpeakerModel>>(speakers));
         }
+
+        /// <summary>
+        /// Example: http://localhost:8088/api/camps/ATL2016/speakers?includeTalks=true
+        /// </summary>
+        [HttpGet]
+        [MapToApiVersion("1.1")]
+        public virtual IActionResult GetWithCount(string moniker, bool includeTalks = false)
+        {
+            var speakers = includeTalks ? _repo.GetSpeakersByMonikerWithTalks(moniker) : _repo.GetSpeakersByMoniker(moniker);
+            return Ok(new { count = speakers.Count(), results = _mapper.Map<IEnumerable<SpeakerModel>>(speakers) });
+        }
+
         /// <summary>
         /// Example: http://localhost:8088/api/camps/ATL2016/speakers/1?includeTalks=true
         /// </summary>

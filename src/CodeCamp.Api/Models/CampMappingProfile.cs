@@ -31,6 +31,10 @@ namespace CodeCamp.Api.Models
                 .ReverseMap()
                 ;
 
+            CreateMap<Speaker, Speaker2Model>()
+                .IncludeBase<Speaker, SpeakerModel>()
+                .ForMember(c => c.BadgeName, options => options.ResolveUsing(s => $"{s.Name} (@{s.TwitterName})"));
+
             CreateMap<Talk, TalkModel>()
                 .ForMember(t => t.Url, options => options.ResolveUsing<TalkUrlResolver>())
                 .ReverseMap();

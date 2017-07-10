@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
+using CodeCamp.Api.Controllers;
+using CodeCamp.Api.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.AspNetCore.Mvc.Versioning.Conventions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -71,6 +75,25 @@ namespace CodeCamp.Api
                         return Task.CompletedTask;
                     },
                 };
+            });
+
+            // versioning
+            services.AddApiVersioning(cfg =>
+            {
+                cfg.DefaultApiVersion = new ApiVersion(1, 1);
+                cfg.AssumeDefaultVersionWhenUnspecified = true;
+                cfg.ReportApiVersions = true;
+                var rdr = new QueryStringOrHeaderApiVersionReader("ver");
+                rdr.HeaderNames.Add("X-CodeCamp-Version");
+                cfg.ApiVersionReader = rdr; // new HeaderApiVersionReader("ver", "X-CodeCamp-Version");
+
+                // centralized versioning (without need to use attributes)
+                cfg.Conventions.Controller<TalksController>()
+                .HasApiVersion(new ApiVersion(1, 0))
+                .HasApiVersion(new ApiVersion(1, 1))
+                .HasApiVersion(new ApiVersion(2, 0))
+                .Action(m => m.Post(default(string), default(int), default(TalkModel)))
+                    .MapToApiVersion(new ApiVersion(2, 0));
             });
 
             // CORS
