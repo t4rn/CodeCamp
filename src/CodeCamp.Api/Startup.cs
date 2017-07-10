@@ -49,6 +49,8 @@ namespace CodeCamp.Api
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddAutoMapper();
 
+            services.AddMemoryCache();
+
             services.AddIdentity<CampUser, IdentityRole>()
                 .AddEntityFrameworkStores<CampContext>();
 
@@ -88,12 +90,12 @@ namespace CodeCamp.Api
                 cfg.ApiVersionReader = rdr; // new HeaderApiVersionReader("ver", "X-CodeCamp-Version");
 
                 // centralized versioning (without need to use attributes)
-                cfg.Conventions.Controller<TalksController>()
-                .HasApiVersion(new ApiVersion(1, 0))
-                .HasApiVersion(new ApiVersion(1, 1))
-                .HasApiVersion(new ApiVersion(2, 0))
-                .Action(m => m.Post(default(string), default(int), default(TalkModel)))
-                    .MapToApiVersion(new ApiVersion(2, 0));
+                //cfg.Conventions.Controller<TalksController>()
+                //.HasApiVersion(new ApiVersion(1, 0))
+                //.HasApiVersion(new ApiVersion(1, 1))
+                //.HasApiVersion(new ApiVersion(2, 0))
+                //.Action(m => m.Post(default(string), default(int), default(TalkModel)))
+                //    .MapToApiVersion(new ApiVersion(2, 0));
             });
 
             // CORS
@@ -127,7 +129,10 @@ namespace CodeCamp.Api
                 {
                     opt.SslPort = 44388;
                 }
-                opt.Filters.Add(new RequireHttpsAttribute());
+                else
+                {
+                    opt.Filters.Add(new RequireHttpsAttribute());
+                }
             })
                 .AddJsonOptions(x =>
                 {
